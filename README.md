@@ -1,2 +1,2 @@
-# kraken2-paper-code
-Code backing the results of the Kraken 2 paper
+# Kraken 2 experiment code
+Code used to download data, simulate reads, build databases, and run comparisons in the Kraken 2 manuscript.
