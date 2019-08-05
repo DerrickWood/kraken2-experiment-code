@@ -3,14 +3,14 @@
 ## Accuracy evaluation
 
 run\_accuracy.bash is the script used to run the classifiers during
-our accuracy evaluation on strain exclusion data.  The \*.res files
+our accuracy evaluation on strain exclusion data.  The `*.res` files
 are intended to be two-column tab-separated value files, with each
 line containing a fragment ID and taxonomic ID.  A taxonomic ID of
 0 is considered to be an unclassified fragment.
 
-Results are obtained by comparing the truth\_bacteria.tsv and
-truth\_virus.tsv files with the \*.res files, using the
-evaluate\_calls command, e.g.:
+Results are obtained by comparing the `truth_bacteria.tsv` and
+`truth_virus.tsv` files with the `*.res` files, using the
+`evaluate_calls` command, e.g.:
 
     evaluate_calls nodes.dmp genus truth_bacteria.tsv strex_kraken2.res
 
@@ -34,5 +34,5 @@ initialize the environment:
     # Allow regular user to read/write from RAMFS
     chown –R ubuntu:ubuntu /ramdisk
 
-We then run the run\_timing.bash script as the regular user ("ubuntu").
-Results are manually parsed from the /usr/bin/time command.
+We then run the `run_timing.bash` script as the regular user ("ubuntu").
+Results are manually parsed from the `/usr/bin/time` command.
