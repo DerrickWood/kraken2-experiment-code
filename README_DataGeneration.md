@@ -71,20 +71,20 @@ changed since then, but similar results should still be obtainable.
     find Bacteria/ Viruses/ -name '*.faa' \
       | xargs assign_protein_taxids.pl acc2taxid.map > rewritten_data.faa
 
-# Perform strain exclusion using the selection lists
+## Perform strain exclusion using the selection lists
     cut -f1 selected_all.list | filter_fasta.pl rewritten_data.fna \
       > strain_excluded.fna
     cut -f1 selected_all.list | filter_fasta.pl rewritten_data.faa \
       > strain_excluded.faa
 
-# Create references for selected projects
+## Create references for selected projects
     mkdir -p Selected/{bacteria,viruses}
     cut -f1 selected_all.list | ./select_fasta.pl rewritten_data.fna
     cd Selected
     cut -f1 ../selected_viruses.list | xargs -n1 -I{} mv {}.fa viruses
     cut -f1 ../selected_bacteria.list | xargs -n1 -I{} mv {}.fa bacteria
 
-# Simulate read data from selected genomes
+## Simulate read data from selected genomes
     for group in bacteria viruses; do
       for file in $group/*.fa; do
         mason_simulator -ir $file --seed 42 -n 500000 --num-threads 4 \
