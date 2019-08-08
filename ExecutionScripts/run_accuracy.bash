@@ -1,4 +1,6 @@
-et -e
+#!/bin/bash
+
+set -e
 
 working_root="/data"
 results_dir="$working_root/Results"
