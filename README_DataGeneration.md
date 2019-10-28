@@ -15,8 +15,8 @@ changed since then, but similar results should still be obtainable.
       ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/Bacteria/all.faa.tar.gz
     wget -O viruses.all.faa.tgz \
       ftp://ftp.ncbi.nlm.nih.gov/genomes/Viruses/all.faa.tar.gz
-    wget -O Taxonomy/gi_taxid_dmp.gz \
-      ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/gi_taxid_dmp.gz
+    wget -O Taxonomy/gi_taxid_nucl.dmp.gz \
+      ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/gi_taxid_nucl.dmp.gz
     wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
     
     tar -C Bacteria -xf bacteria.all.fna.tgz
@@ -24,13 +24,14 @@ changed since then, but similar results should still be obtainable.
     tar -C Viruses -xf viruses.all.fna.tgz
     tar -C Viruses -xf viruses.all.faa.tgz
     tar -C Taxonomy -xf taxdump.tar.gz
-    gunzip Taxonomy/gi_taxid_dmp.gz
+    gunzip Taxonomy/gi_taxid_nucl.dmp.gz
 
 ## Code to select the strains for exclusion
 
     # Look at all genome files, only select those with "complete genome",
     # exclude plasmids and 2nd/3rd chromosomes; this gives a list containing one
-    # entry per genome.
+    # entry per genome.  This code does not delete any sequences, and all sequences
+    # are still available for reference/simulation data later.
     find Bacteria/ -name '*.fna' | xargs cat | grep '^>' | grep "complete genome" \
       | grep -v plasmid | grep -v 'chromosome \(2\|3\|II\)' > bacteria_headers.list
 
@@ -62,8 +63,11 @@ changed since then, but similar results should still be obtainable.
 
 ## Gather all nucleotide data, and add taxonomy information
 
+    # All downloaded nucleotide data is gathered into original_data.fna
     find Bacteria/ Viruses/ -name '*.fna' | xargs cat > original_data.fna
-    rewrite_fasta.pl original.fna > rewritten_data.fna
+
+    # Each FASTA header is modified to include taxonomy information
+    rewrite_fasta.pl original_data.fna > rewritten_data.fna
 
 ## Use nucleotide taxonomy information for protein data
     grep '^>' rewritten_data.fna \
@@ -72,6 +76,9 @@ changed since then, but similar results should still be obtainable.
       | xargs assign_protein_taxids.pl acc2taxid.map > rewritten_data.faa
 
 ## Perform strain exclusion using the selection lists
+
+    # filter_fasta.pl will remove all sequences from the FASTA input
+    # that are associated with taxa provided on STDIN
     cut -f1 selected_all.list | filter_fasta.pl rewritten_data.fna \
       > strain_excluded.fna
     cut -f1 selected_all.list | filter_fasta.pl rewritten_data.faa \
@@ -79,6 +86,9 @@ changed since then, but similar results should still be obtainable.
 
 ## Create references for selected projects
     mkdir -p Selected/{bacteria,viruses}
+    # select_fasta.pl will write into the Selected/ directory a
+    # file for each taxid provided via STDIN, containing all of the
+    # FASTA input sequences that are associated with that taxid
     cut -f1 selected_all.list | ./select_fasta.pl rewritten_data.fna
     cd Selected
     cut -f1 ../selected_viruses.list | xargs -n1 -I{} mv {}.fa viruses
